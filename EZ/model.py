@@ -2,7 +2,7 @@ import numpy as np
 from sympy.utilities.lambdify import lambdify
 from EZ.data import figure_layout
 import lmfit
-import SchemDraw as schem
+import schemdraw as schem
 import sympy as sym
 from sympy.parsing.sympy_parser import parse_expr
 from sympy.printing.mathml import print_mathml
@@ -12,7 +12,7 @@ sym.init_printing(use_latex='mathjax')
 sym_omega = sym.Symbol(r"omega", real=True)
 schem_unit = 1
 style = dict(
-    schem_unit=schem_unit,
+    unit=schem_unit,
     inches_per_unit=0.3,
     lw=1,
     fontsize=10
@@ -186,8 +186,8 @@ class Circuit(Model):
         self.description += circuit_2.description
 
         # Update schem
-        schem_1 = schem.group_elements(circuit_1.schem)
-        schem_2 = schem.group_elements(circuit_2.schem)
+        schem_1 = schem.elements.ElementDrawing(circuit_1.schem)
+        schem_2 = schem.elements.ElementDrawing(circuit_2.schem)
         self.schem = schem.Drawing(**style)
         self.schem.add(schem_1)
         self.schem.add(schem.elements.LINE, d='right', l=schem_unit / 2)
@@ -216,24 +216,22 @@ class Circuit(Model):
         self.description += format(circuit_2)
 
         # Update schem
-        schem_1 = schem.group_elements(circuit_1.schem)
-        schem_2 = schem.group_elements(circuit_2.schem)
+        schem_1 = schem.elements.ElementDrawing(circuit_1.schem)
+        schem_2 = schem.elements.ElementDrawing(circuit_2.schem)
 
         self.schem = schem.Drawing(**style)
         self.schem.push()
         c1 = self.schem.add(schem_1)
         self.schem.pop()
-        self.schem.add(schem.elements.LINE, d='down', l=circuit_1.schem_height)
-        self.schem.add(schem_2, d='right')
+        self.schem.add(schem.elements.LINE)
+        self.schem.add(schem_2)
         if circuit_1.schem_width <= circuit_2.schem_width:
-            c2 = self.schem.add(schem.elements.LINE, d='up',
-                                l=circuit_1.schem_height)
-            self.schem.add(schem.elements.LINE, d='right',
-                           xy=c1.end, tox=c2.end)
+            c2 = self.schem.add(schem.elements.LINE)
+            self.schem.add(schem.elements.LINE, d='right')
+  #                         xy=c1.at(), tox=c2)
         else:
-            self.schem.add(schem.elements.LINE, d='right', tox=c1.end)
-            self.schem.add(schem.elements.LINE, d='up',
-                           l=circuit_1.schem_height)
+            self.schem.add(schem.elements.LINE)
+            self.schem.add(schem.elements.LINE)
 
         self.schem_width = np.max([
             circuit_1.schem_width,

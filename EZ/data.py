@@ -102,7 +102,7 @@ class Dataset():
         for file_path in glob.glob(fr'{self.folder}/*.csv'):
             E = float(
                 file_path
-                .split("/")[-1]
+                .split(os.path.sep)[-1]
                 .split(" ")[0]
                 .replace("_", ".")
             )
